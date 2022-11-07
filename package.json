@@ -9,11 +9,14 @@
         "build": "parcel build"
     },
     "devDependencies": {
+        "@parcel/packager-raw-url": "^2.7.0",
+        "@parcel/transformer-webmanifest": "^2.7.0",
         "parcel": "latest"
     },
     "dependencies": {
         "@parcel/service-worker": "^2.7.0",
         "leaflet": "^1.9.2",
+        "netlify-cli": "^12.1.0",
         "workbox-precaching": "^6.5.4"
     }
 }
