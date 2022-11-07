@@ -1,16 +1,19 @@
 {
     "name": "locator",
     "source": [
-        "src/index.html"
+        "src/index.html",
+        "src/camera.html"
     ],
     "scripts": {
-        "start": "parcel --https --port 443",
+        "start": "parcel",
         "build": "parcel build"
     },
     "devDependencies": {
         "parcel": "latest"
     },
     "dependencies": {
-        "leaflet": "^1.9.2"
+        "@parcel/service-worker": "^2.7.0",
+        "leaflet": "^1.9.2",
+        "workbox-precaching": "^6.5.4"
     }
 }

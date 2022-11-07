@@ -1,0 +1,50 @@
+canvas {
+    display: none;
+}
+
+.camera {
+    width: 340px;
+}
+
+body.video-mode .camera {
+    display: inline-block;
+}
+
+body.photo-mode .camera {
+    display: none;
+}
+
+video {
+    border: 1px solid black;
+    width: 320px;
+    height: 240px;
+}
+
+.output {
+    width: 340px;
+    display: none;
+    vertical-align: top;
+}
+
+body.video-mode .output {
+    display: none;
+}
+
+body.photo-mode .output {
+    display: inline-block;
+}
+
+.output img {
+    border: 1px solid black;
+    width: 320px;
+    height: 240px;
+}
+
+/* buttons */
+input[type="image"] {
+    height: 32px;
+}
+
+input[type="image"]:disabled {
+    filter: opacity(0.25);
+}

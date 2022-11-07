@@ -29,12 +29,9 @@ dl dd {
 }
 
 input#camera {
-    content: url("camera.svg");
     height: 24px;
 }
 
 input#camera:disabled {
-    content: url("camera.svg");
-    height: 24px;
     filter: opacity(0.25);
 }
