@@ -32,7 +32,7 @@
         }
     ],
     "related_applications": [],
-    "prefer_related_applications": "false",
+    "prefer_related_applications": false,
     "shortcuts": [
         {
             "name": "street map",
