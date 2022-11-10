@@ -10,9 +10,9 @@ body.video-mode .camera {
     display: inline-block;
 }
 
-body.photo-mode .camera {
+/* body.photo-mode .camera {
     display: none;
-}
+} */
 
 video {
     border: 1px solid black;
@@ -22,13 +22,13 @@ video {
 
 .output {
     width: 340px;
-    display: none;
+    /* display: none; */
     vertical-align: top;
 }
 
-body.video-mode .output {
+/* body.video-mode .output {
     display: none;
-}
+} */
 
 body.photo-mode .output {
     display: inline-block;
@@ -36,8 +36,8 @@ body.photo-mode .output {
 
 .output img {
     border: 1px solid black;
-    width: 320px;
-    height: 240px;
+    /* width: 320px; */
+    /* height: 240px; */
 }
 
 /* buttons */

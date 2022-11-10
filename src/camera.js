@@ -3,13 +3,12 @@ import saveURL from './save.svg';
 import xCircleURL from './x-circle.svg';
 
 const VIDEO_ID = 'video';
-const VIDEO_DIV_ID = 'video-container';
 const SHOOT_ID = 'play-pause';
 const SAVE_ID = 'save';
 const CANCEL_ID = 'cancel';
 const CANVAS_ID = 'canvas';
 const PHOTO_IMG_ID = 'photo';
-const PHOTO_DIV_ID = 'img-container';
+const OUTLET_ID = 'outlet'
 
 const VIDEO_MODE_CLASS = 'video-mode';
 const PHOTO_MODE_CLASS = 'photo-mode';
@@ -20,21 +19,25 @@ let height = 0;     // This will be computed based on the input stream
 let streaming = false;  //flag to do a 1st-time init
 
 //page elements
-let video = null;
-let videoContainer = null;
+let video = document.createElement('video');
+video.textContent = 'Video stream not available.';
+video.setAttribute('muted', true);
+video.setAttribute('autoplay', true);
+video.setAttribute('playsinline', true);
+
 let canvas = null;
-let photoImg = null;
-let photoImgContainer = null;
+let photoImg = document.createElement('img');
 
 const pausePlayButton = document.getElementById(SHOOT_ID);
 const saveButton = document.getElementById(SAVE_ID);
 const cancelButton = document.getElementById(CANCEL_ID);
+const outletDiv = document.getElementById(OUTLET_ID);
 
 let imageData = null;   //data of last captured photo
 
 function clearPhoto() {
     const context = canvas.getContext('2d');
-    context.fillStyle = "#222";
+    context.fillStyle = "#444444";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     const data = canvas.toDataURL('image/png');
@@ -64,9 +67,13 @@ function takePicture(event) {
         context.fillText(text, wHalf, height - 4, textWidth);
 
         imageData = canvas.toDataURL('image/png');
-        photo.setAttribute('src', imageData);
+        photoImg.src = imageData;
+        photoImg.width = width;
+        photoImg.height = height;
 
         //switch to image display
+        outletDiv.removeChild(video);
+        outletDiv.appendChild(photoImg);
         document.body.className = PHOTO_MODE_CLASS;
 
         saveButton.disabled = false;
@@ -97,6 +104,8 @@ function cancelPicture(event) {
     imageData = null;
 
     //switch to image display
+    outletDiv.removeChild(photoImg);
+    outletDiv.appendChild(video);
     document.body.className = VIDEO_MODE_CLASS;
     saveButton.disabled = true;
 
@@ -104,13 +113,35 @@ function cancelPicture(event) {
     pausePlayButton.onclick = takePicture;
 }
 
+function adjustAspectRation(event) {
+    //perform a one-time adjustment of video's and photo's aspect ratio
+    if (!streaming) {
+        height = video.videoHeight / video.videoWidth * width;
+        if (isNaN(height)) {
+            height = width * 3.0 / 4.0;
+        }
+
+        video.width = width;
+        video.height = height;
+        canvas.width = width;
+        canvas.height = height;
+        photoImg.width = width;
+        photoImg.height = height;
+        streaming = true;
+    }
+    pausePlayButton.onclick = takePicture;
+    pausePlayButton.src = pauseBtnURL;
+
+    saveButton.onclick = saveAndExit;
+}
+
 function startup() {
-    video = document.getElementById(VIDEO_ID);
     canvas = document.getElementById(CANVAS_ID);
-    photoImg = document.getElementById(PHOTO_IMG_ID);
+
+    video.addEventListener('canplay', adjustAspectRation, false);
 
     //start video playback
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
         .then((stream) => {
             video.srcObject = stream;
             video.play();
@@ -118,27 +149,6 @@ function startup() {
         .catch((err) => {
             console.error(`An error occurred: ${err}`);
         });
-
-    //further initializations as soon as a video stream appears
-    video.addEventListener('canplay', (ev) => {
-        //perform a one-time adjustment of video's and photo's aspect ratio
-        if (!streaming) {
-            height = video.videoHeight / video.videoWidth * width;
-            if (isNaN(height)) {
-                height = width * 3.0 / 4.0;
-            }
-
-            video.setAttribute('width', width);
-            video.setAttribute('height', height);
-            canvas.setAttribute('width', width);
-            canvas.setAttribute('height', height);
-            streaming = true;
-        }
-        pausePlayButton.onclick = takePicture;
-        pausePlayButton.src = pauseBtnURL;
-
-        saveButton.onclick = saveAndExit;
-    }, false);
 
     clearPhoto();
 }
@@ -148,5 +158,6 @@ cancelButton.src = xCircleURL;
 cancelButton.onclick = (e) => backToLocator();
 saveButton.src = saveURL;
 pausePlayButton.src = pauseBtnURL;
+outletDiv.appendChild(video);
 
 window.addEventListener('load', startup, false);

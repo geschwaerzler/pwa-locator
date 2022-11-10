@@ -22,7 +22,7 @@ var headingMarker;
 var headingImage;
 
 function configureMap(latLngArray) {
-    radius = 100.0;
+    let radius = 100.0;
 
     if (!latLngArray) {
         latLngArray = [0, 0];
@@ -54,7 +54,8 @@ function configureMap(latLngArray) {
         const lngLat = key.split('x');
         const marker = L.marker([Number(lngLat[1]), Number(lngLat[0])], { icon: markerIcon }).addTo(map);
         marker.bindPopup((layer) => {
-            const photo = new Image(160, 120);
+            const photo = document.createElement('img');
+            photo.width = 160;
             photo.src = localStorage.getItem(key);
             return photo;
         });
