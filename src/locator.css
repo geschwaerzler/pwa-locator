@@ -17,7 +17,7 @@ div.safe-area {
 
 div.h-safe-area-inset-top {
     height: env(safe-area-inset-top);
-    background-color: #00000044;
+    background-color: #00000077;
 }
 
 div#map {
@@ -86,5 +86,5 @@ input#camera {
 }
 
 input#camera:disabled {
-    filter: opacity(0.50);
+    filter: opacity(0.70);
 }
