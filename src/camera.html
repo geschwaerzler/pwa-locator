@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="camera.js" type="module"></script>
+    <link rel="stylesheet" href="camera.css">
+
+    <title>Locator's Camera</title>
+</head>
+
+<body class="video-mode">
+    <!-- area used eg by iOS for status icons and the notch / dynamic island -->
+    <div class="safe-area">
+        <div class="h-safe-area-inset-top"></div>
+    </div>
+    <div id="outlet"></div>
+    <div class="btn-bar">
+        <input id="save" type="image" disabled="disabled">
+        <input id="play-pause" type="image">
+        <input id="cancel" type="image">
+    </div>
+</body>
+
+</html>

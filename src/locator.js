@@ -9,6 +9,8 @@ const LOCATION_LEFT_ID = 'location-left';
 const LOCATION_MIDDLE_ID = 'location-middle';
 const CAMERA_INPUT_ID = 'camera';
 
+const LAST_COORDS_KEY = 'last-coords';
+
 //map state
 var map;
 var ranger;
@@ -36,20 +38,26 @@ function configureMap(latLngArray) {
         maxZoom: 19,
         attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
-    ranger = L.circle(latLngArray, { radius: 20.0 }).addTo(map);
+    ranger = L.circle(latLngArray, { radius: 100.0 }).addTo(map);
 
     headingImage = new Image(31, 31);
     headingImage.src = arrowUpImage;
     const headingIcon = L.divIcon({ html: headingImage, iconSize: [31, 31], className: '' });
-    headingMarker = L.marker([0, 0], { icon: headingIcon }).addTo(map);
+    headingMarker = L.marker([0, 0], { icon: headingIcon });
 }
 
 function updatePosition(position, zoom) {
     const locatorLeftDiv = document.getElementById(LOCATION_LEFT_ID);
     const locatorMiddleDiv = document.getElementById(LOCATION_MIDDLE_ID);
+    const cameraButton = document.getElementById(CAMERA_INPUT_ID);
 
     const coords = position.coords;
-    console.debug(`got new coordinates: ${coords}`);
+    const ll = [coords.latitude, coords.longitude];
+
+    console.debug(`got new coordinates: ${ll}`);
+
+    localStorage.setItem(LAST_COORDS_KEY, JSON.stringify(ll));
+
     locatorLeftDiv.innerHTML = `
         <dl>
             <dt>LAT</dt>
@@ -68,9 +76,7 @@ function updatePosition(position, zoom) {
             <dt>SPD</dt>
             <dd>${coords.speed ? DIST_FORMATTER.format(coords.speed) : '-'}</dd>
         </dl>`;
-    var ll = [coords.latitude, coords.longitude];
 
-    var ll = [coords.latitude, coords.longitude];
     if (zoom) {
         map.setView(ll, zoom);
     } else {
@@ -79,12 +85,20 @@ function updatePosition(position, zoom) {
     ranger.setLatLng(ll);
     ranger.setRadius(coords.accuracy);
     if (coords.heading) {
-        headingMarker.addTo(map);
-        headingMarker.setLatLng(ll);
+        headingMarker.setLatLng(ll).addTo(map);
         headingImage.style.transform = `rotate(${coords.heading}deg)`;
     } else {
         headingMarker.removeFrom(map);
     }
+
+    //activate camera button
+    cameraButton.disabled = false;
+}
+
+function openCamera(event) {
+    const url = `/camera.html`;
+    console.debug(`navigating to: ${url}`);
+    window.location.href = url;
 }
 
 function logError(err) {
@@ -94,18 +108,22 @@ function logError(err) {
 /* setup component */
 window.onload = () => {
     const cameraButton = document.getElementById(CAMERA_INPUT_ID);
-    const queryParams = new URLSearchParams(window.location.search);
 
     //setup UI
     cameraButton.src = cameraImage;
+    cameraButton.onclick = openCamera;
 
     //init leaflet
-    configureMap([47.406653, 9.744844]);
+    const ll = JSON.parse(localStorage.getItem(LAST_COORDS_KEY));
+    if (ll) {
+        configureMap(ll)
+    } else {
+        //take FHV position as default
+        configureMap([47.406653, 9.744844]);
+    }
 
     // setup service worker
-    const swDisbaled = (queryParams.get('service-worker') === 'disabled');
-    console.debug(`query param 'service-worker': ${queryParams.get('service-worker')}, disabled: ${swDisbaled}`);
-    if (!swDisbaled && 'serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register(
             new URL('serviceworker.js', import.meta.url),
             { type: 'module' }
@@ -126,4 +144,11 @@ window.onload = () => {
         locatorDiv.innerHTML = 'Geolocation is not available.'
     }
 
+}
+
+window.onbeforeunload = () => {
+    if (geo) {
+        console.debug(`will clear the watcher ${watcherId}`);
+        geo.clearWatch(watcherId);
+    }
 }
