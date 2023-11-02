@@ -1,3 +1,6 @@
+import markerPath2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerPath from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import arrowUpImage from './arrow-up-circle.svg';
 import cameraImage from './camera.svg';
 
@@ -44,6 +47,26 @@ function configureMap(latLngArray) {
     headingImage.src = arrowUpImage;
     const headingIcon = L.divIcon({ html: headingImage, iconSize: [31, 31], className: '' });
     headingMarker = L.marker([0, 0], { icon: headingIcon });
+
+    /* set markers */
+    const markerIcon = new L.Icon.Default({
+        iconUrl: markerPath,
+        iconRetinaUrl: markerPath2x,
+        shadowUrl: markerShadow
+    });
+    Object.keys(localStorage)
+        .filter((key) => key !== LAST_COORDS_KEY)
+        .forEach((key) => {
+            const lngLat = key.split('x');
+            const marker = L.marker([Number(lngLat[0]), Number(lngLat[1])], { icon: markerIcon })
+                .addTo(map);
+            marker.bindPopup((layer) => {
+                const photo = document.createElement('img');
+                photo.width = 160;
+                photo.src = localStorage.getItem(key);
+                return photo;
+            });
+        });
 }
 
 function updatePosition(position, zoom) {

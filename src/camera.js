@@ -15,6 +15,7 @@ var photoImg;
 var pausePlayButton;
 var saveButton;
 var cancelButton;
+var canvasImgBlob;
 
 function backToLocator() {
     const url = '/index.html';
@@ -25,8 +26,12 @@ function backToLocator() {
 function saveAndExit() {
     console.debug('saveAndExit');
     const ll = JSON.parse(localStorage.getItem(LAST_COORDS_KEY));
-    localStorage.setItem(`${ll[0]}x${ll[1]}`, photoImg.src);
-    backToLocator();
+    const reader = new FileReader();
+    reader.onloadend = function () {
+        localStorage.setItem(`${ll[0]}x${ll[1]}`, reader.result);
+        backToLocator();
+    };
+    reader.readAsDataURL(canvasImgBlob);
 }
 
 function takePicture() {
@@ -43,12 +48,29 @@ function takePicture() {
     const context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, width, height);
 
+    //draw text into image
+    const ll = JSON.parse(localStorage.getItem(LAST_COORDS_KEY));
+    context.font = '12pt monospace';
+    const text = `${ll[0]} x ${ll[1]}`;
+    const textWidth = context.measureText(text).width;
+    const tHalf = textWidth / 2;
+    const wHalf = width / 2;
+    //transparent background
+    context.fillStyle = 'rgba(255, 255, 0, 0.5)';
+    context.fillRect(wHalf - tHalf - 2, height - 20 + 2, textWidth + 2, 20 - 4);
+    //text
+    context.fillStyle = 'black';
+    context.textAlign = 'center';
+    context.fillText(text, wHalf, height - 4, textWidth);
+
+
     canvas.convertToBlob({ type: 'image/jpeg' }).then(
         (blob) => {
+            canvasImgBlob = blob;
             const imageData = URL.createObjectURL(blob);
             photoImg.width = width;
             photoImg.height = height;
-            photoImg.setAttribute('src', imageData);
+            photoImg.src = imageData;
 
             //put image on page
             outletDiv.removeChild(video);

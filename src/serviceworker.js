@@ -5,6 +5,7 @@ import { warmStrategyCache } from 'workbox-recipes';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 
+self.__WB_DISABLE_DEV_LOGS = true;
 
 // Set up page cache
 const assetsCache = new StaleWhileRevalidate({
